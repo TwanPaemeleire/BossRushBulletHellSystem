@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="../Bloodforge/Bloodforge.vcxproj" />
+  <Project Path="BossRushBulletHellSystem/BossRushBulletHellSystem.vcxproj">
+    <BuildDependency Project="../Bloodforge/Bloodforge.vcxproj" />
+  </Project>
+</Solution>

@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{700caf96-4883-436f-8074-62e6c3396572}</ProjectGuid>
+    <RootNamespace>ECSEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Bloodforge</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\SDL3\include;$(SolutionDir)3rdParty\SDL3_image\include;$(SolutionDir)3rdParty\SDL3_ttf\include;$(SolutionDir)3rdParty\SDL3_mixer\include;$(SolutionDir)3rdParty\SteamSDK\steam;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command> xcopy "$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget)\SDL3.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget)\SDL3_image.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget)\SDL3_ttf.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget)\SDL3_mixer.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget)\steam_api.dll" "$(OutputPath)" /R /Y</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>SDL3.lib;SDL3_image.lib;SDL3_ttf.lib;SDL3_mixer.lib;steam_api.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\SDL3\include;$(SolutionDir)3rdParty\SDL3_image\include;$(SolutionDir)3rdParty\SDL3_ttf\include;$(SolutionDir)3rdParty\SDL3_mixer\include;$(SolutionDir)3rdParty\SteamSDK\steam;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command> xcopy "$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget)\SDL3.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget)\SDL3_image.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget)\SDL3_ttf.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget)\SDL3_mixer.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget)\steam_api.dll" "$(OutputPath)" /R /Y</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>SDL3.lib;SDL3_image.lib;SDL3_ttf.lib;SDL3_mixer.lib;steam_api.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\SDL3\include;$(SolutionDir)3rdParty\SDL3_image\include;$(SolutionDir)3rdParty\SDL3_ttf\include;$(SolutionDir)3rdParty\SDL3_mixer\include;$(SolutionDir)3rdParty\SteamSDK\steam;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command> xcopy "$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget)\SDL3.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget)\SDL3_image.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget)\SDL3_ttf.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget)\SDL3_mixer.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget)\steam_api64.dll" "$(OutputPath)" /R /Y</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>SDL3.lib;SDL3_image.lib;SDL3_ttf.lib;SDL3_mixer.lib;steam_api64.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\SDL3\include;$(SolutionDir)3rdParty\SDL3_image\include;$(SolutionDir)3rdParty\SDL3_ttf\include;$(SolutionDir)3rdParty\SDL3_mixer\include;$(SolutionDir)3rdParty\SteamSDK\steam;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command> xcopy "$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget)\SDL3.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget)\SDL3_image.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget)\SDL3_ttf.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget)\SDL3_mixer.dll" "$(OutputPath)" /R /Y
+ xcopy "$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget)\steam_api64.dll" "$(OutputPath)" /R /Y</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>SDL3.lib;SDL3_image.lib;SDL3_ttf.lib;SDL3_mixer.lib;steam_api64.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\SDL3\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_image\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_ttf\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SDL3_mixer\lib\$(PlatformTarget);$(SolutionDir)3rdParty\SteamSDK\lib\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ActionQueueComponent.h" />
+    <ClInclude Include="ActionQueueSystem.h" />
+    <ClInclude Include="ArchetypeIdentifierMask.h" />
+    <ClInclude Include="AudioSourceComponent.h" />
+    <ClInclude Include="AudioSourceSystem.h" />
+    <ClInclude Include="Bloodforge.h" />
+    <ClInclude Include="BloodRenderer.h" />
+    <ClInclude Include="BloodTime.h" />
+    <ClInclude Include="ButtonComponent.h" />
+    <ClInclude Include="ButtonSystem.h" />
+    <ClInclude Include="CameraComponent.h" />
+    <ClInclude Include="CameraSystem.h" />
+    <ClInclude Include="CollisionSystem.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentRegistry.h" />
+    <ClInclude Include="CustomCoroutine.h" />
+    <ClInclude Include="CustomCoroutineDataComponent.h" />
+    <ClInclude Include="CustomCoroutinesMapHolderComponent.h" />
+    <ClInclude Include="CustomCoroutineSystem.h" />
+    <ClInclude Include="CustomCursor.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityChunk.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="FileSaveLoadUtils.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="FunctionInvokeComponent.h" />
+    <ClInclude Include="FunctionInvokeSystem.h" />
+    <ClInclude Include="GlobalEventHandler.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="KeyDefs.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Rect.h" />
+    <ClInclude Include="RectColliderComponent.h" />
+    <ClInclude Include="SceneDataComponent.h" />
+    <ClInclude Include="SceneManagingDataComponent.h" />
+    <ClInclude Include="SceneSystemManager.h" />
+    <ClInclude Include="SpriteAnimatorData.h" />
+    <ClInclude Include="SpriteTextRendererSystem.h" />
+    <ClInclude Include="SteamIndicateAchievementProgressRequest.h" />
+    <ClInclude Include="SteamResetUserDataRequest.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="IdCreator.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="SpriteAnimatorComponent.h" />
+    <ClInclude Include="SpriteAnimatorSystem.h" />
+    <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="SteamStateComponent.h" />
+    <ClInclude Include="SteamSupportSystem.h" />
+    <ClInclude Include="SteamUtils.h" />
+    <ClInclude Include="System.h" />
+    <ClInclude Include="TextComponent.h" />
+    <ClInclude Include="TextSystem.h" />
+    <ClInclude Include="Texture2D.h" />
+    <ClInclude Include="TransformComponent.h" />
+    <ClInclude Include="SteamUnlockAchievementRequest.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="WindowUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ActionQueueSystem.cpp" />
+    <ClCompile Include="AudioSourceComponent.cpp" />
+    <ClCompile Include="AudioSourceSystem.cpp" />
+    <ClCompile Include="Bloodforge.cpp" />
+    <ClCompile Include="BloodRenderer.cpp" />
+    <ClCompile Include="ButtonSystem.cpp" />
+    <ClCompile Include="CameraSystem.cpp" />
+    <ClCompile Include="CollisionSystem.cpp" />
+    <ClCompile Include="ComponentRegistry.cpp" />
+    <ClCompile Include="CustomCoroutine.cpp" />
+    <ClCompile Include="CustomCoroutineSystem.cpp" />
+    <ClCompile Include="CustomCursor.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityChunk.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="FunctionInvokeSystem.cpp" />
+    <ClCompile Include="GlobalEventHandler.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="RectColliderComponent.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="SceneSystemManager.cpp" />
+    <ClCompile Include="SpriteAnimatorComponent.cpp" />
+    <ClCompile Include="SpriteAnimatorSystem.cpp" />
+    <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="SpriteTextRendererSystem.cpp" />
+    <ClCompile Include="SteamSupportSystem.cpp" />
+    <ClCompile Include="SteamUtils.cpp" />
+    <ClCompile Include="System.cpp" />
+    <ClCompile Include="TextSystem.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
+    <ClCompile Include="TransformComponent.cpp" />
+    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="WindowUtils.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
