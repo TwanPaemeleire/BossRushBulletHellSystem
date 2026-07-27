@@ -15,6 +15,8 @@
 
 #include <SceneDataComponent.h>
 #include <SceneManagingDataComponent.h>
+#include <SpriteComponent.h>
+#include <SpriteAnimatorComponent.h>
 
 void LoadFunction()
 {
@@ -29,10 +31,10 @@ int main(int, char* [])
 	engine.SetResourcesDirectory("Resources");
 
 	Bloodforge::WindowUtils::SetWindowAlwaysOnTop(false);
-	Bloodforge::WindowUtils::SetWindowBordered(true);
+	Bloodforge::WindowUtils::SetWindowBordered(false);
 	Bloodforge::WindowUtils::SetWindowFullScreen(false);
-	Bloodforge::WindowUtils::SetWindowSize(350, 350);
-	Bloodforge::WindowUtils::SetWindowTitle("VampireIdleGame");
+	Bloodforge::WindowUtils::SetWindowSize(700, 700);
+	Bloodforge::WindowUtils::SetWindowTitle("BossRushBulletHellSystem");
 
 	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
 	Bloodforge::SceneSystemManager& sceneSystemManager = Bloodforge::SceneSystemManager::GetInstance();
