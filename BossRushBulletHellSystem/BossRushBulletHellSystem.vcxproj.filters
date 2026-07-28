@@ -21,7 +21,10 @@
     <ClCompile Include="Attacks\BossAttackingSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Boss\BossesDataBank.cpp">
+    <ClCompile Include="Boss\BossCreation\BossFilesFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Blackboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Boss\BossActionsFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss\BossCreation\BossFilesFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

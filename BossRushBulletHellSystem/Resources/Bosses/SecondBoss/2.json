@@ -1,0 +1,23 @@
+{
+    "BossPhases": [
+        {
+            "CanExecutiveConsectiveActions": true,
+            "HealthPercentageThreshold": 0.6000000238418579,
+            "KeepPreviousPhasesActions": false,
+            "PossibleActions": [
+                {
+                    "Blackboard": {
+                        "BlackboardMap": {
+                            "982562406": {
+                                "Type": "float",
+                                "Value": 15.0
+                            }
+                        }
+                    },
+                    "ChanceWeight": 20,
+                    "Id": 4109245160
+                }
+            ]
+        }
+    ]
+}

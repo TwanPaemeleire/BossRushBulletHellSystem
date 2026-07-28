@@ -8,7 +8,6 @@ struct BossAction;
 
 struct BossesDataBank final : public Bloodforge::Component<BossesDataBank>
 {
-	BossesDataBank();
 	std::unordered_map<BossId, BossConfigCollection> BossesConfigCollectionsMap;
 	std::unordered_map<BossActionId, BossAction> BossActionsMap;
 };

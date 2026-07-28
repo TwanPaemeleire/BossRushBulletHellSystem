@@ -1,20 +1,72 @@
 #pragma once
 #include <vector>
 #include <Utils/Blackboard.h>
+#include <json.hpp>
 
 using BossActionId = unsigned int;
 
 struct BossPhaseActionConfig final
 {
 	int ChanceWeight = 1;
-	BossActionId Id;
+	BossActionId Id = 0;
 	Blackboard Blackboard;
 };
 
-struct Bossconfig final
+inline void to_json(nlohmann::json& j, const BossPhaseActionConfig& p)
 {
-	std::vector<std::vector<BossPhaseActionConfig>> PossibleActionsPerPhaseIds;
-	std::vector<bool> CanExecuteConsecutivePerPhase; // List of bools indicating whether the boss can execute the same action twice in a row in each phase
-	std::vector<bool> KeepPreviousPhasesActionsPerPhase; // List of bools indicating whether the boss can keep actions from previous phases when entering a new phase
-	std::vector<float> HealthPercentageThresholdPerPhase; // List of health percentage thresholds for each phase (amount of phases = amount of thresholds + 1)
+	j = nlohmann::json{
+		{ "ChanceWeight", p.ChanceWeight },
+		{ "Id", p.Id },
+		{"Blackboard", p.Blackboard}
+	};
+}
+
+inline void from_json(const nlohmann::json& j, BossPhaseActionConfig& p)
+{
+	j.at("ChanceWeight").get_to(p.ChanceWeight);
+	j.at("Id").get_to(p.Id);
+	j.at("Blackboard").get_to(p.Blackboard);
+}
+
+struct BossPhaseConfig final
+{
+	std::vector<BossPhaseActionConfig> PossibleActions;
+	bool CanExecutiveConsectiveActions = true;
+	bool KeepPreviousPhasesActions = false;
+	float HealthPercentageThreshold = 1.0f;
 };
+
+inline void to_json(nlohmann::json& j, const BossPhaseConfig& p)
+{
+	j = nlohmann::json{
+		{ "PossibleActions", p.PossibleActions },
+		{ "CanExecutiveConsectiveActions", p.CanExecutiveConsectiveActions },
+		{ "KeepPreviousPhasesActions", p.KeepPreviousPhasesActions },
+		{ "HealthPercentageThreshold", p.HealthPercentageThreshold }
+	};
+}
+
+inline void from_json(const nlohmann::json& j, BossPhaseConfig& p)
+{
+	j.at("PossibleActions").get_to(p.PossibleActions);
+	j.at("CanExecutiveConsectiveActions").get_to(p.CanExecutiveConsectiveActions);
+	j.at("KeepPreviousPhasesActions").get_to(p.KeepPreviousPhasesActions);
+	j.at("HealthPercentageThreshold").get_to(p.HealthPercentageThreshold);
+}
+
+struct BossConfig final
+{
+	std::vector<BossPhaseConfig> BossPhases;
+};
+
+inline void to_json(nlohmann::json& j, const BossConfig& p)
+{
+	j = nlohmann::json{
+		{ "BossPhases", p.BossPhases }
+	};
+}
+
+inline void from_json(const nlohmann::json& j, BossConfig& p)
+{
+	j.at("BossPhases").get_to(p.BossPhases);
+}

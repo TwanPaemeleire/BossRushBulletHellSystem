@@ -15,14 +15,39 @@
 
 #include <SceneDataComponent.h>
 #include <SceneManagingDataComponent.h>
-#include <SpriteComponent.h>
-#include <SpriteAnimatorComponent.h>
+#include "Boss/BossCreation/BossFilesFactory.h"
 
 void LoadFunction()
 {
 	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
 	Bloodforge::ResourceManager& resourceManager = Bloodforge::ResourceManager::GetInstance();
 	Bloodforge::BloodRenderer& renderer = Bloodforge::BloodRenderer::GetInstance();
+
+
+	BossFilesFactory factory;
+	{
+		BossMakerHelper bossMakerHelper = factory.StartBossCreation(CreateId("FirstBoss"), "TestBoss", 0);
+
+		BossPhaseMakerHelper& phase1MakerHelper = bossMakerHelper.AddPhaseToBoss(0.5f, true, false);
+
+		BossPhaseActionMakerHelper& action1Phase1MakerHelper = phase1MakerHelper.AddActionToBossPhase(20, CreateId("TestAction"));
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("TestBlackboardKey"), 15.0f);
+
+		factory.FinishBossCreation(bossMakerHelper);
+	}
+
+	{
+		BossMakerHelper bossMakerHelper = factory.StartBossCreation(CreateId("SecondBoss"), "SecondBoss", 2);
+
+		BossPhaseMakerHelper& phase1MakerHelper = bossMakerHelper.AddPhaseToBoss(0.6f, true, false);
+
+		BossPhaseActionMakerHelper& action1Phase1MakerHelper = phase1MakerHelper.AddActionToBossPhase(20, CreateId("TestAction"));
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("SecondTest"), 15.0f);
+
+		factory.FinishBossCreation(bossMakerHelper);
+	}
+
+	factory.WriteAllToFiles();
 }
 
 int main(int, char* [])
