@@ -8,8 +8,6 @@
 #include <WindowUtils.h>
 #include <EntityManager.h>
 #include <IdCreator.h>
-#include <ResourceManager.h>
-#include <BloodRenderer.h>
 #include <SceneSystemManager.h>
 #include <InputHandler.h>
 
@@ -19,11 +17,10 @@
 
 void LoadFunction()
 {
-	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
-	Bloodforge::ResourceManager& resourceManager = Bloodforge::ResourceManager::GetInstance();
-	Bloodforge::BloodRenderer& renderer = Bloodforge::BloodRenderer::GetInstance();
+}
 
-
+void SaveAllBosses()
+{
 	BossFilesFactory factory;
 	{
 		BossMakerHelper bossMakerHelper = factory.StartBossCreation(CreateId("FirstBoss"), "TestBoss", 0);
@@ -54,6 +51,13 @@ int main(int, char* [])
 {
 	Bloodforge::Bloodforge& engine = Bloodforge::Bloodforge::GetInstance();
 	engine.SetResourcesDirectory("Resources");
+
+	bool isGameRun = true;
+	if (!isGameRun)
+	{
+		SaveAllBosses();
+		return 0;
+	}
 
 	Bloodforge::WindowUtils::SetWindowAlwaysOnTop(false);
 	Bloodforge::WindowUtils::SetWindowBordered(false);

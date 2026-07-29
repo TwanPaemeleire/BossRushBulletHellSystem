@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Vector2.h"
 #include <cmath>
+#include <algorithm>
 
 namespace Bloodforge
 {
@@ -173,17 +174,20 @@ namespace Bloodforge
 
     Vector2 Vector2::Lerp(const Vector2& start, const Vector2& end, float t)
     {
+        t = std::clamp(t, 0.f, 1.0f);
         return start + (end - start) * t;
     }
 
     Vector2 Vector2::SmoothLerp(const Vector2& start, const Vector2& end, float t)
     {
+        t = std::clamp(t, 0.f, 1.0f);
         float smoothT = t * t * (3.0f - 2.0f * t);
         return start + (end - start) * smoothT;
     }
 
     Vector2 Vector2::SmoothEndLerp(const Vector2& start, const Vector2& end, float t)
     {
+        t = std::clamp(t, 0.f, 1.0f);
         float smoothT = 1.0f - (1.0f - t) * (1.0f - t);
         return start + (end - start) * smoothT;
     }

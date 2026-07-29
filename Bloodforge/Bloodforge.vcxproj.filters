@@ -288,6 +288,9 @@
     <ClInclude Include="SpriteAnimatorData.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="MathUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Generated">

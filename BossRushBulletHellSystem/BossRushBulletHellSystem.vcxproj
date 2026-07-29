@@ -152,6 +152,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Attacks\BossAttackingSystem.cpp" />
+    <ClCompile Include="BossActions\BossActionsFunctions.cpp" />
+    <ClCompile Include="BossActions\BossAttackingSystem.cpp" />
     <ClCompile Include="Boss\BossCreation\BossFilesFactory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Utils\Blackboard.cpp" />
@@ -159,7 +161,9 @@
   <ItemGroup>
     <ClInclude Include="Attacks\BossAction.h" />
     <ClInclude Include="Attacks\BossAttackingSystem.h" />
-    <ClInclude Include="Boss\BossActionsFunctions.h" />
+    <ClInclude Include="BossActions\BossAction.h" />
+    <ClInclude Include="BossActions\BossAttackingSystem.h" />
+    <ClInclude Include="BossActions\BossActionsFunctions.h" />
     <ClInclude Include="Boss\BossConfig.h" />
     <ClInclude Include="Boss\BossConfigCollection.h" />
     <ClInclude Include="Boss\BossCreation\BossFilesFactory.h" />
