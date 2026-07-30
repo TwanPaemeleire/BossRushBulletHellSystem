@@ -1,5 +1,6 @@
 #pragma once
 #include <numbers>
+#include "json.hpp"
 
 namespace Bloodforge
 {
@@ -48,4 +49,18 @@ namespace Bloodforge
 		static constexpr float RadiansToDegrees = 180.0f / std::numbers::pi_v<float>;
 		static constexpr float DegreesToRadians = std::numbers::pi_v<float> / 180.0f;
 	};
+
+	inline void to_json(nlohmann::json& j, const Vector2& p)
+	{
+		j = nlohmann::json{
+			{ "X", p.X },
+			{ "Y", p.Y }
+		};
+	}
+
+	inline void from_json(const nlohmann::json& j, Vector2& p)
+	{
+		j.at("X").get_to(p.X);
+		j.at("Y").get_to(p.Y);
+	}
 }

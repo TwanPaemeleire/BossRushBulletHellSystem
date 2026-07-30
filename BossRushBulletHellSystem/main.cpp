@@ -20,6 +20,7 @@
 #include <Boss/BossesDataBank.h>
 
 #include <BossActions/BossAttackingSystem.h>
+#include <Projectiles/BasicProjectileSystem.h>
 
 void SaveAllBosses()
 {
@@ -31,10 +32,11 @@ void SaveAllBosses()
 
 		BossPhaseActionMakerHelper& action1Phase1MakerHelper = phase1MakerHelper.AddActionToBossPhase(20, CreateId("RotatingShooters"));
 		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("AmountOfShooters"), 8);
-		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("AmountOfFullRotations"), 2.0f);
-		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeed"), 20.0f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("AmountOfFullRotations"), 10.0f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeed"), 360.0f);
 		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeedApplyTime"), 0.5f);
-		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletShootDelay"), 0.2f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletShootDelay"), 0.08f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletSpawnPos"), Bloodforge::Vector2(350.0f, 350.0f));
 
 		factory.FinishBossCreation(bossMakerHelper);
 	}
@@ -75,6 +77,7 @@ int main(int, char* [])
 	Bloodforge::SceneSystemManager& sceneSystemManager = Bloodforge::SceneSystemManager::GetInstance();
 
 	sceneSystemManager.TryRegisterSystem<BossAttackingSystem>();
+	sceneSystemManager.TryRegisterSystem<BasicProjectileSystem>();
 
 	Bloodforge::InputHandler::GetInstance().CreateMap(CreateId("MainMap"));
 	Bloodforge::InputHandler::GetInstance().SetCurrentMap(CreateId("MainMap"));

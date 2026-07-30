@@ -8,6 +8,11 @@
 #include <Vector2.h>
 #include <BloodTime.h>
 #include <MathUtils.h>
+#include <ResourceManager.h>
+#include <SpriteAnimatorComponent.h>
+#include <SpriteComponent.h>
+#include <Projectiles/BasicProjectile.h>
+#include <iostream>
 
 using namespace Bloodforge;
 
@@ -19,12 +24,34 @@ Coroutine ShootBullet(int shooterIdx)
         RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
         Blackboard& currentBlackboard = runtimeBossData.GetCurrentBlackboard();
 
-        float angle = currentBlackboard.Get<std::vector<float>>(CreateId("ShootingAngles"))[shooterIdx] * Vector2::DegreesToRadians;
-        Vector2 direction;
-        direction.X = std::cos(angle);
-        direction.Y = std::sin(angle);
-
         // Spawn bullet here
+        Entity& bulletEntity = entityManager.CreateEntity();
+        int bulletEntityId = bulletEntity.Id;
+
+        SpriteComponent* sprite = entityManager.AddComponent<SpriteComponent>(bulletEntityId);
+        sprite->SetTexture(ResourceManager::GetInstance().LoadTexture("Projectile.png"));
+        sprite->SetCustomSourceRect({ 0.f, 0.f, sprite->GetTexture()->GetWidth() / 5.0f, sprite->GetTexture()->GetHeight() });
+
+        SpriteAnimatorComponent* animator = entityManager.AddComponent<SpriteAnimatorComponent>(bulletEntityId);
+        AnimationData animData;
+        animData.NumberOfFrames = 5;
+        animData.Texture = ResourceManager::GetInstance().LoadTexture("Projectile.png");
+        animData.ShouldLoop = true;
+        animator->AddAnimation(CreateId("ProjectileAnim"), animData);
+        animator->PlayAnimation(CreateId("ProjectileAnim"));
+
+        BasicProjectile* projectile = entityManager.AddComponent<BasicProjectile>(bulletEntityId);
+        projectile->Speed = 200.0f;
+
+        runtimeBossData = entityManager.GetFirstEntityWithComponents<RuntimeCurrentBossData>().value().GetComponent<RuntimeCurrentBossData>();
+        currentBlackboard = runtimeBossData.GetCurrentBlackboard();
+
+        std::vector<float>& shootingAngles = currentBlackboard.Get<std::vector<float>>(CreateId("ShootingAngles"));
+
+        TransformComponent* transform = entityManager.GetComponent<TransformComponent>(bulletEntityId);
+        transform->SetLocalRotation(shootingAngles[shooterIdx]);
+        transform->SetLocalPosition(currentBlackboard.Get<Vector2>(CreateId("BulletSpawnPos")));
+
         co_await WaitForSeconds(currentBlackboard.Get<float>(CreateId("BulletShootDelay")));
     }
 }

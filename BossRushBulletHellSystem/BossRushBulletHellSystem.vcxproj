@@ -151,6 +151,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Projectiles\BasicProjectileSystem.cpp" />
     <ClCompile Include="BossActions\BossActionsFunctions.cpp" />
     <ClCompile Include="BossActions\BossAttackingSystem.cpp" />
     <ClCompile Include="Boss\BossCreation\BossFilesFactory.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="Attacks\BossAction.h" />
     <ClInclude Include="Attacks\BossAttackingSystem.h" />
+    <ClInclude Include="Projectiles\BasicProjectileSystem.h" />
     <ClInclude Include="BossActions\BossAction.h" />
     <ClInclude Include="BossActions\BossAttackingSystem.h" />
     <ClInclude Include="BossActions\BossActionsFunctions.h" />
@@ -169,6 +171,7 @@
     <ClInclude Include="Boss\BossCreation\BossFilesFactory.h" />
     <ClInclude Include="Boss\BossesDataBank.h" />
     <ClInclude Include="Boss\RuntimeCurrentBossData.h" />
+    <ClInclude Include="Projectiles\BasicProjectile.h" />
     <ClInclude Include="Utils\Blackboard.h" />
   </ItemGroup>
   <ItemGroup>
