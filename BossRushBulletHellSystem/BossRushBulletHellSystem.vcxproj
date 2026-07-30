@@ -151,10 +151,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Attacks\BossAttackingSystem.cpp" />
     <ClCompile Include="BossActions\BossActionsFunctions.cpp" />
     <ClCompile Include="BossActions\BossAttackingSystem.cpp" />
     <ClCompile Include="Boss\BossCreation\BossFilesFactory.cpp" />
+    <ClCompile Include="Boss\BossesDataBank.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Utils\Blackboard.cpp" />
   </ItemGroup>

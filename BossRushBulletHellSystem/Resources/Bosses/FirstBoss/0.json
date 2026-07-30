@@ -1,0 +1,40 @@
+{
+    "BossPhases": [
+        {
+            "CanExecutiveConsectiveActions": true,
+            "HealthPercentageThreshold": 0.5,
+            "KeepPreviousPhasesActions": false,
+            "PossibleActions": [
+                {
+                    "Blackboard": {
+                        "BlackboardMap": {
+                            "1269865847": {
+                                "Type": "float",
+                                "Value": 2.0
+                            },
+                            "2518348546": {
+                                "Type": "float",
+                                "Value": 20.0
+                            },
+                            "2832589974": {
+                                "Type": "int",
+                                "Value": 8
+                            },
+                            "4082405273": {
+                                "Type": "float",
+                                "Value": 0.5
+                            },
+                            "717602438": {
+                                "Type": "float",
+                                "Value": 0.20000000298023224
+                            }
+                        }
+                    },
+                    "ChanceWeight": 20,
+                    "Id": 652163327
+                }
+            ],
+            "WeightSum": 20
+        }
+    ]
+}

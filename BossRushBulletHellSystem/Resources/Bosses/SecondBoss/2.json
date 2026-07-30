@@ -17,7 +17,8 @@
                     "ChanceWeight": 20,
                     "Id": 4109245160
                 }
-            ]
+            ],
+            "WeightSum": 20
         }
     ]
 }

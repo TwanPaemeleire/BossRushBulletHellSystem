@@ -77,6 +77,7 @@ BossPhaseConfig& BossPhaseMakerHelper::GetPhaseConfig()
     for (BossPhaseActionMakerHelper& actionMakerHelper : m_ActionMakerHelpers)
     {
         m_PhaseConfig.PossibleActions.emplace_back(actionMakerHelper.GetBossPhaseActionConfig());
+        m_PhaseConfig.WeightSum += m_PhaseConfig.PossibleActions[m_PhaseConfig.PossibleActions.size() - 1].ChanceWeight;
     }
     return m_PhaseConfig;
 }

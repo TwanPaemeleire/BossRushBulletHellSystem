@@ -15,31 +15,26 @@
 #include <SceneManagingDataComponent.h>
 #include "Boss/BossCreation/BossFilesFactory.h"
 
-void LoadFunction()
-{
-}
+#include <Boss/RuntimeCurrentBossData.h>
+#include <FileSaveLoadUtils.h>
+#include <Boss/BossesDataBank.h>
+
+#include <BossActions/BossAttackingSystem.h>
 
 void SaveAllBosses()
 {
 	BossFilesFactory factory;
 	{
-		BossMakerHelper bossMakerHelper = factory.StartBossCreation(CreateId("FirstBoss"), "TestBoss", 0);
+		BossMakerHelper bossMakerHelper = factory.StartBossCreation(CreateId("FirstBoss"), "FirstBoss", 0);
 
 		BossPhaseMakerHelper& phase1MakerHelper = bossMakerHelper.AddPhaseToBoss(0.5f, true, false);
 
-		BossPhaseActionMakerHelper& action1Phase1MakerHelper = phase1MakerHelper.AddActionToBossPhase(20, CreateId("TestAction"));
-		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("TestBlackboardKey"), 15.0f);
-
-		factory.FinishBossCreation(bossMakerHelper);
-	}
-
-	{
-		BossMakerHelper bossMakerHelper = factory.StartBossCreation(CreateId("SecondBoss"), "SecondBoss", 2);
-
-		BossPhaseMakerHelper& phase1MakerHelper = bossMakerHelper.AddPhaseToBoss(0.6f, true, false);
-
-		BossPhaseActionMakerHelper& action1Phase1MakerHelper = phase1MakerHelper.AddActionToBossPhase(20, CreateId("TestAction"));
-		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("SecondTest"), 15.0f);
+		BossPhaseActionMakerHelper& action1Phase1MakerHelper = phase1MakerHelper.AddActionToBossPhase(20, CreateId("RotatingShooters"));
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("AmountOfShooters"), 8);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("AmountOfFullRotations"), 2.0f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeed"), 20.0f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeedApplyTime"), 0.5f);
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletShootDelay"), 0.2f);
 
 		factory.FinishBossCreation(bossMakerHelper);
 	}
@@ -47,17 +42,28 @@ void SaveAllBosses()
 	factory.WriteAllToFiles();
 }
 
+void LoadFunction()
+{
+	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
+	Bloodforge::SceneSystemManager& sceneSystemManager = Bloodforge::SceneSystemManager::GetInstance();
+
+	BossesDataBank& dataBank = entityManager.GetOrCreateFirstEntityWithComponents<BossesDataBank>().GetComponent<BossesDataBank>();
+
+	RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
+	
+	BossConfig bossConfig = Bloodforge::FileSaveLoadUtils::LoadFile<BossConfig>("Bosses/FirstBoss/0.json");
+	runtimeBossData.CurrentBossConfig = bossConfig;
+	runtimeBossData.CurrentBosId = CreateId("FirstBoss");
+	runtimeBossData.CurrentBossLevel = 0;
+	runtimeBossData.StartBossFightTrigger = true;
+}
+
 int main(int, char* [])
 {
 	Bloodforge::Bloodforge& engine = Bloodforge::Bloodforge::GetInstance();
 	engine.SetResourcesDirectory("Resources");
 
-	bool isGameRun = true;
-	if (!isGameRun)
-	{
-		SaveAllBosses();
-		return 0;
-	}
+	SaveAllBosses();
 
 	Bloodforge::WindowUtils::SetWindowAlwaysOnTop(false);
 	Bloodforge::WindowUtils::SetWindowBordered(false);
@@ -67,6 +73,8 @@ int main(int, char* [])
 
 	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
 	Bloodforge::SceneSystemManager& sceneSystemManager = Bloodforge::SceneSystemManager::GetInstance();
+
+	sceneSystemManager.TryRegisterSystem<BossAttackingSystem>();
 
 	Bloodforge::InputHandler::GetInstance().CreateMap(CreateId("MainMap"));
 	Bloodforge::InputHandler::GetInstance().SetCurrentMap(CreateId("MainMap"));

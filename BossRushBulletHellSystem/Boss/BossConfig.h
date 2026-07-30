@@ -34,6 +34,7 @@ struct BossPhaseConfig final
 	bool CanExecutiveConsectiveActions = true;
 	bool KeepPreviousPhasesActions = false;
 	float HealthPercentageThreshold = 1.0f;
+	int WeightSum = 0;
 };
 
 inline void to_json(nlohmann::json& j, const BossPhaseConfig& p)
@@ -42,7 +43,8 @@ inline void to_json(nlohmann::json& j, const BossPhaseConfig& p)
 		{ "PossibleActions", p.PossibleActions },
 		{ "CanExecutiveConsectiveActions", p.CanExecutiveConsectiveActions },
 		{ "KeepPreviousPhasesActions", p.KeepPreviousPhasesActions },
-		{ "HealthPercentageThreshold", p.HealthPercentageThreshold }
+		{ "HealthPercentageThreshold", p.HealthPercentageThreshold },
+		{"WeightSum", p.WeightSum}
 	};
 }
 
@@ -52,6 +54,7 @@ inline void from_json(const nlohmann::json& j, BossPhaseConfig& p)
 	j.at("CanExecutiveConsectiveActions").get_to(p.CanExecutiveConsectiveActions);
 	j.at("KeepPreviousPhasesActions").get_to(p.KeepPreviousPhasesActions);
 	j.at("HealthPercentageThreshold").get_to(p.HealthPercentageThreshold);
+	j.at("WeightSum").get_to(p.WeightSum);
 }
 
 struct BossConfig final

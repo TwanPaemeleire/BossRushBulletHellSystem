@@ -6,7 +6,7 @@ using BossActionId = unsigned int;
 
 struct BossAction
 {
-	BossActionId ActionId;
+	BossActionId ActionId = 0;
 	std::function<void()> OnStartFunction;
 	std::function<void()> OnUpdateFunction;
 	std::function<void()> OnFinishedFunction;

@@ -11,33 +11,22 @@
 
 using namespace Bloodforge;
 
-void BossActionsFunctions::RotatingShootersStart()
+Coroutine ShootBullet(int shooterIdx)
 {
-    EntityManager& entityManager = EntityManager::GetInstance();
-    RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
-    Blackboard& currentBlackboard = runtimeBossData.GetCurrentBlackboard();
-
-    srand(time(0));
-    int randomNum = rand() % 2;
-    int randomDirection = std::rand();
-    currentBlackboard.Set<bool>(CreateId("RotatingClockwise"), randomDirection == 0);
-    currentBlackboard.Set<std::vector<float>>(CreateId("ShootingAngles"), {});
-    currentBlackboard.Set<std::vector<int>>(CreateId("RotatingCoroutines"), {});
-    currentBlackboard.Set<std::vector<int>>(CreateId("ShootingCoroutines"), {});
-
-    int amountOfShooters = currentBlackboard.Get<int>(CreateId("AmountOfShooters"));
-
-    float shooterAngleInterval = 360.0f / (float)amountOfShooters;
-    for (int shooterIdx = 0; shooterIdx < amountOfShooters; ++shooterIdx)
+    while (true)
     {
-        float angle = shooterIdx * shooterAngleInterval;
-        currentBlackboard.Get<std::vector<float>>(CreateId("ShootingAngles")).emplace_back(angle);
-        currentBlackboard.Get<std::vector<int>>(CreateId("RotatingCoroutines")).emplace_back(StartCoroutine(ShootWhileRotating(angle, shooterIdx)));
-    }
-}
+        EntityManager& entityManager = EntityManager::GetInstance();
+        RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
+        Blackboard& currentBlackboard = runtimeBossData.GetCurrentBlackboard();
 
-void BossActionsFunctions::RotatingShootersUpdate()
-{
+        float angle = currentBlackboard.Get<std::vector<float>>(CreateId("ShootingAngles"))[shooterIdx] * Vector2::DegreesToRadians;
+        Vector2 direction;
+        direction.X = std::cos(angle);
+        direction.Y = std::sin(angle);
+
+        // Spawn bullet here
+        co_await WaitForSeconds(currentBlackboard.Get<float>(CreateId("BulletShootDelay")));
+    }
 }
 
 Coroutine ShootWhileRotating(float startAngle, int shooterIdx)
@@ -68,29 +57,38 @@ Coroutine ShootWhileRotating(float startAngle, int shooterIdx)
         if (!rotatingClockwise) shootingAngles[shooterIdx] -= angleToAdd;
         else shootingAngles[shooterIdx] += angleToAdd;
         angleTracker += angleToAdd;
-        WaitUntilNextFrame();
+        co_await WaitUntilNextFrame();
     }
 
     runtimeBossData = entityManager.GetFirstEntityWithComponents<RuntimeCurrentBossData>().value().GetComponent<RuntimeCurrentBossData>();
     runtimeBossData.CurrentActionFinishedTrigger = true;
 }
 
-Coroutine ShootBullet(int shooterIdx)
+void BossActionsFunctions::RotatingShootersStart()
 {
-    while (true)
+    EntityManager& entityManager = EntityManager::GetInstance();
+    RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
+    Blackboard& currentBlackboard = runtimeBossData.GetCurrentBlackboard();
+
+    bool clockwise = (std::rand() % 2) == 0;
+    currentBlackboard.Set(CreateId("RotatingClockwise"), clockwise);
+    currentBlackboard.Set<std::vector<float>>(CreateId("ShootingAngles"), {});
+    currentBlackboard.Set<std::vector<int>>(CreateId("RotatingCoroutines"), {});
+    currentBlackboard.Set<std::vector<int>>(CreateId("ShootingCoroutines"), {});
+
+    int amountOfShooters = currentBlackboard.Get<int>(CreateId("AmountOfShooters"));
+
+    float shooterAngleInterval = 360.0f / (float)amountOfShooters;
+    for (int shooterIdx = 0; shooterIdx < amountOfShooters; ++shooterIdx)
     {
-        EntityManager& entityManager = EntityManager::GetInstance();
-        RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
-        Blackboard& currentBlackboard = runtimeBossData.GetCurrentBlackboard();
-
-        float angle = currentBlackboard.Get<std::vector<float>>(CreateId("ShootingAngles"))[shooterIdx] * Vector2::DegreesToRadians;
-        Vector2 direction;
-        direction.X = std::cos(angle);
-        direction.Y = std::sin(angle);
-
-        // Spawn bullet here
-        WaitForSeconds(currentBlackboard.Get<float>(CreateId("BulletShootDelay")));
+        float angle = shooterIdx * shooterAngleInterval;
+        currentBlackboard.Get<std::vector<float>>(CreateId("ShootingAngles")).emplace_back(angle);
+        currentBlackboard.Get<std::vector<int>>(CreateId("RotatingCoroutines")).emplace_back(StartCoroutine(ShootWhileRotating(angle, shooterIdx)));
     }
+}
+
+void BossActionsFunctions::RotatingShootersUpdate()
+{
 }
 
 void BossActionsFunctions::RotatingShootersStop()

@@ -77,6 +77,7 @@ inline void from_json(const nlohmann::json& j, Blackboard& board)
                 return pair.second.Name == typeName;
             });
 
-        board.BlackboardMap[std::stoi(id)] = it->second.Deserialize(entry["Value"]);
+
+        board.BlackboardMap[std::stoul(id)] = it->second.Deserialize(entry["Value"]);
     }
 }
