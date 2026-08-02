@@ -12,7 +12,7 @@
 #include <SpriteAnimatorComponent.h>
 #include <SpriteComponent.h>
 #include <Projectiles/BasicProjectile.h>
-#include <iostream>
+#include <RectColliderComponent.h>
 
 using namespace Bloodforge;
 
@@ -24,8 +24,8 @@ Coroutine ShootBullet(int shooterIdx)
         RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
         Blackboard& currentBlackboard = runtimeBossData.GetCurrentBlackboard();
 
-        // Spawn bullet here
         Entity& bulletEntity = entityManager.CreateEntity();
+		bulletEntity.Tag = CreateId("BossProjectile");
         int bulletEntityId = bulletEntity.Id;
 
         SpriteComponent* sprite = entityManager.AddComponent<SpriteComponent>(bulletEntityId);
@@ -51,6 +51,9 @@ Coroutine ShootBullet(int shooterIdx)
         TransformComponent* transform = entityManager.GetComponent<TransformComponent>(bulletEntityId);
         transform->SetLocalRotation(shootingAngles[shooterIdx]);
         transform->SetLocalPosition(currentBlackboard.Get<Vector2>(CreateId("BulletSpawnPos")));
+
+		RectColliderComponent* collider = entityManager.AddComponent<RectColliderComponent>(bulletEntityId);
+		collider->SetSize({ 42.0f, 20.0f });
 
         co_await WaitForSeconds(currentBlackboard.Get<float>(CreateId("BulletShootDelay")));
     }

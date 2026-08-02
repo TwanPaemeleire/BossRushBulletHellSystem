@@ -21,6 +21,10 @@
 
 #include <BossActions/BossAttackingSystem.h>
 #include <Projectiles/BasicProjectileSystem.h>
+#include <SpriteComponent.h>
+#include <SpriteAnimatorComponent.h>
+#include <ResourceManager.h>
+#include <CircleColliderComponent.h>
 
 void SaveAllBosses()
 {
@@ -36,7 +40,7 @@ void SaveAllBosses()
 		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeed"), 360.0f);
 		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("ShootersRotationSpeedApplyTime"), 0.5f);
 		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletShootDelay"), 0.08f);
-		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletSpawnPos"), Bloodforge::Vector2(350.0f, 350.0f));
+		action1Phase1MakerHelper.AddValueToBlackboard(CreateId("BulletSpawnPos"), Bloodforge::Vector2(Bloodforge::WindowUtils::GetWindowSize() / 2.0f));
 
 		factory.FinishBossCreation(bossMakerHelper);
 	}
@@ -58,6 +62,35 @@ void LoadFunction()
 	runtimeBossData.CurrentBosId = CreateId("FirstBoss");
 	runtimeBossData.CurrentBossLevel = 0;
 	runtimeBossData.StartBossFightTrigger = true;
+
+
+	Bloodforge::Entity& inconsistencyEntity = entityManager.CreateEntity();
+	int inconsistencyEntityId = inconsistencyEntity.Id;
+	entityManager.AddComponent<Bloodforge::SpriteComponent>(inconsistencyEntityId);
+	Bloodforge::SpriteAnimatorComponent* spriteAnimator = entityManager.AddComponent<Bloodforge::SpriteAnimatorComponent>(inconsistencyEntityId);
+	
+	Bloodforge::AnimationData animData;
+	animData.NumberOfFrames = 4;
+	animData.FrameTime = 0.08;
+	animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("InconsistencyArea.png");
+
+	spriteAnimator->AddAnimation(CreateId("InconsistencyArea"), animData);
+	spriteAnimator->PlayAnimation(CreateId("InconsistencyArea"));
+
+	Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(inconsistencyEntityId);
+	transform->SetLocalPosition(400.0f, 400.0f);
+
+	Bloodforge::CircleColliderComponent* circleCollider = entityManager.AddComponent<Bloodforge::CircleColliderComponent>(inconsistencyEntityId);
+	circleCollider->Radius = 80.0f;
+
+	circleCollider->OnCollisionEnterEvent.AddListener([inconsistencyEntityId](int firstEntityId, int secondEntityId)
+		{
+			Bloodforge::Entity& otherEntity = Bloodforge::EntityManager::GetInstance().GetEntity(secondEntityId);
+			if (otherEntity.Tag == CreateId("BossProjectile"))
+			{
+				Bloodforge::EntityManager::GetInstance().DestroyEntity(secondEntityId);
+			}
+		});
 }
 
 int main(int, char* [])
@@ -65,13 +98,13 @@ int main(int, char* [])
 	Bloodforge::Bloodforge& engine = Bloodforge::Bloodforge::GetInstance();
 	engine.SetResourcesDirectory("Resources");
 
-	SaveAllBosses();
-
 	Bloodforge::WindowUtils::SetWindowAlwaysOnTop(false);
-	Bloodforge::WindowUtils::SetWindowBordered(false);
-	Bloodforge::WindowUtils::SetWindowFullScreen(false);
-	Bloodforge::WindowUtils::SetWindowSize(700, 700);
+	Bloodforge::WindowUtils::SetWindowFullScreen(true);
+	Bloodforge::WindowUtils::SetWindowBordered(true);
+	Bloodforge::WindowUtils::SetWindowSize(1920, 1080);
 	Bloodforge::WindowUtils::SetWindowTitle("BossRushBulletHellSystem");
+
+	SaveAllBosses();
 
 	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
 	Bloodforge::SceneSystemManager& sceneSystemManager = Bloodforge::SceneSystemManager::GetInstance();

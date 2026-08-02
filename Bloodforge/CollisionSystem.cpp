@@ -4,77 +4,81 @@
 #include "RectColliderComponent.h"
 #include "TransformComponent.h"
 #include "BloodRenderer.h"
+#include "CircleColliderComponent.h"
 
 namespace Bloodforge
 {
 	void CollisionSystem::OnLateUpdate()
 	{
+		std::unordered_set<uint64_t> currentFrame;
 		UpdateAllCollisionRects();
-		std::unordered_set<uint64_t> currentFrameCollisions;
-		EntityManager& entityManager = EntityManager::GetInstance();
 
-		EntityQueryResult<RectColliderComponent, TransformComponent> result = entityManager.QueryEntities<RectColliderComponent, TransformComponent>();
-		for (size_t entityIndex = 0; entityIndex < result.EntityViews.size(); ++entityIndex)
+		CheckRectRect(currentFrame);
+		CheckCircleRect(currentFrame);
+		CheckCircleCircle(currentFrame);
+
+		CheckCollisionExits(currentFrame);
+
+		m_LastFrameCollisions = std::move(currentFrame);
+	}
+
+	template<typename ColliderA, typename ColliderB>
+	void CollisionSystem::HandleCollision(ColliderA& colliderA, ColliderB& colliderB, int firstEntityId, int secondEntityId, std::unordered_set<uint64_t>& currentFrameCollisions)
+	{
+		Entity& firstEntity = EntityManager::GetInstance().GetEntity(firstEntityId);
+		Entity& secondEntity = EntityManager::GetInstance().GetEntity(secondEntityId);
+		bool firstIgnoresSecond = colliderA.IgnoreTags.contains(secondEntity.Tag);
+		bool secondIgnoresFirst = colliderB.IgnoreTags.contains(firstEntity.Tag);
+
+		uint64_t packed = Pack(firstEntityId, secondEntityId);
+
+		if (!m_LastFrameCollisions.contains(packed))
 		{
-			EntityView<RectColliderComponent, TransformComponent>& view = result.EntityViews[entityIndex];
-			RectColliderComponent& rect1 = view.GetComponent<RectColliderComponent>();
-			TransformComponent& transform1 = view.GetComponent<TransformComponent>();
-			for (size_t innerEntityIndex = entityIndex + 1; innerEntityIndex < result.EntityViews.size(); ++innerEntityIndex)
-			{
-				RectColliderComponent& rect2 = result.EntityViews[innerEntityIndex].GetComponent<RectColliderComponent>();
-				TransformComponent& transform2 = result.EntityViews[innerEntityIndex].GetComponent<TransformComponent>();
-				if (rect1.OwnerEntityId == rect2.OwnerEntityId) continue; // Checking collider against itself
-
-				Entity& entity1 = entityManager.GetEntity(rect1.OwnerEntityId);
-				Entity& entity2 = entityManager.GetEntity(rect2.OwnerEntityId);
-				bool rect1IgnoresRect2 = rect1.IgnoreTags.contains(entity2.Tag);
-				bool rect2IgnoresRect1 = rect2.IgnoreTags.contains(entity1.Tag);
-				if (rect1IgnoresRect2 && rect2IgnoresRect1) continue; // If they both ignore each other, no need to check collision
-
-				if (IsOverlappingAABB(rect1.GetRect(), rect2.GetRect()))
-				{
-					if ((transform1.GetWorldRotation() == 0.0f && transform2.GetWorldRotation() == 0.0f) || IsOverlapping(rect1.GetRect(), rect2.GetRect()))
-					{
-						std::pair<int, int> pair = { transform1.OwnerEntityId, transform2.OwnerEntityId };
-						// Were not colliding last frame
-						if (!m_LastFrameCollisions.contains(Pack(transform1.OwnerEntityId, transform2.OwnerEntityId)))
-						{
-							if (!rect1IgnoresRect2) rect1.OnCollisionEnterEvent.Invoke(rect1.OwnerEntityId, rect2.OwnerEntityId);
-							if (!rect2IgnoresRect1) rect2.OnCollisionEnterEvent.Invoke(rect2.OwnerEntityId, rect1.OwnerEntityId);
-						}
-
-						// Collision event gets called every frame
-						if (!rect1IgnoresRect2) rect1.OnCollisionEvent.Invoke(rect1.OwnerEntityId, rect2.OwnerEntityId);
-						if (!rect2IgnoresRect1) rect2.OnCollisionEvent.Invoke(rect2.OwnerEntityId, rect1.OwnerEntityId);
-
-					}
-					if (entity1.MarkedForDestruction || entity2.MarkedForDestruction) continue; // If either entity is marked for destruction, skip adding to current collisions to prevent collision exit from being called next frame
-					currentFrameCollisions.insert(Pack(transform1.OwnerEntityId, transform2.OwnerEntityId));
-				}
-			}
+			if (!firstIgnoresSecond) colliderA.OnCollisionEnterEvent.Invoke(firstEntityId, secondEntityId);
+			if (!secondIgnoresFirst) colliderB.OnCollisionEnterEvent.Invoke(secondEntityId, firstEntityId);
 		}
 
-		// Check for collision exits
-		for (const auto& lastFramePair : m_LastFrameCollisions)
+		if (!firstIgnoresSecond) colliderA.OnCollisionEvent.Invoke(firstEntityId, secondEntityId);
+		if (!secondIgnoresFirst) colliderB.OnCollisionEvent.Invoke(secondEntityId, firstEntityId);
+
+		Entity& updatedFirstEntity = EntityManager::GetInstance().GetEntity(firstEntityId);
+		Entity& updatedSecondEntity = EntityManager::GetInstance().GetEntity(secondEntityId);
+		if (!updatedFirstEntity.MarkedForDestruction && !updatedSecondEntity.MarkedForDestruction)
 		{
-			if(!currentFrameCollisions.contains(lastFramePair))
+			currentFrameCollisions.insert(packed);
+		}
+	}
+
+	void CollisionSystem::CheckRectRect(std::unordered_set<uint64_t>& currentCollisions)
+	{
+		auto result = EntityManager::GetInstance().QueryEntities<RectColliderComponent, TransformComponent>();
+
+		for (size_t index = 0; index < result.EntityViews.size(); ++index)
+		{
+			for (size_t innerIndex = index + 1; innerIndex < result.EntityViews.size(); ++innerIndex)
 			{
-				int first = UnpackFirst(lastFramePair);
-				int second = UnpackSecond(lastFramePair);
-				Entity& firstEntity = entityManager.GetEntity(first);
-				Entity& secondEntity = entityManager.GetEntity(second);
-				if (!firstEntity.IsAlive || !secondEntity.IsAlive) continue;
-				RectColliderComponent* firstRect = entityManager.GetComponent<RectColliderComponent>(firstEntity);
-				RectColliderComponent* secondRect = entityManager.GetComponent<RectColliderComponent>(secondEntity);
-				if (!firstRect || !secondRect) continue;
-				bool firstIgnoresSecond = firstRect->IgnoreTags.contains(secondEntity.Tag);
-				bool secondIgnoresFirst = secondRect->IgnoreTags.contains(firstEntity.Tag);
-				if(!firstIgnoresSecond) firstRect->OnCollisionExitEvent.Invoke(first, second);
-				if(!secondIgnoresFirst) secondRect->OnCollisionExitEvent.Invoke(second, first);
+				auto& rect1 = result.EntityViews[index].GetComponent<RectColliderComponent>();
+				auto& rect2 = result.EntityViews[innerIndex].GetComponent<RectColliderComponent>();
+
+				if (!RectRectOverlap(rect1, rect2)) continue;
+
+				HandleCollision<Bloodforge::RectColliderComponent, Bloodforge::RectColliderComponent>(rect1, rect2, result.EntityViews[index].EntityId, result.EntityViews[innerIndex].EntityId, currentCollisions);
 			}
 		}
+	}
 
-		m_LastFrameCollisions = std::move(currentFrameCollisions);
+	bool CollisionSystem::RectRectOverlap(RectColliderComponent& rect1, RectColliderComponent& rect2)
+	{
+		if (IsRecttOverlappingAABB(rect1.GetRect(), rect2.GetRect()))
+		{
+			TransformComponent* transform1 = EntityManager::GetInstance().GetComponent<TransformComponent>(rect1.OwnerEntityId);
+			TransformComponent* transform2 = EntityManager::GetInstance().GetComponent<TransformComponent>(rect2.OwnerEntityId);
+			if ((transform1->GetWorldRotation() == 0.0f && transform2->GetWorldRotation() == 0.0f) || IsRectOverlappingAxis(rect1.GetRect(), rect2.GetRect()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void CollisionSystem::OnRender()
@@ -87,6 +91,15 @@ namespace Bloodforge
 			RectColliderComponent& rect = view.GetComponent<RectColliderComponent>();
 			const ColliderRect& collisionRect = rect.GetRect();
 			BloodRenderer::GetInstance().DrawRectangle(collisionRect, Color(255, 255, 255, 255));
+		}
+
+		auto circleResult = EntityManager::GetInstance().QueryEntities<CircleColliderComponent, TransformComponent>();
+		for (EntityView<CircleColliderComponent, TransformComponent>& view : circleResult.EntityViews)
+		{
+			CircleColliderComponent& circle = view.GetComponent<CircleColliderComponent>();
+			TransformComponent* transform = EntityManager::GetInstance().GetComponent<TransformComponent>(circle.OwnerEntityId);
+			Vector2 worldPos = transform->GetWorldPosition();
+			BloodRenderer::GetInstance().DrawCircle(worldPos, circle.Radius, Color(255, 255, 255, 255));
 		}
 #endif
 	}
@@ -105,14 +118,14 @@ namespace Bloodforge
 		}
 	}
 
-	bool CollisionSystem::IsOverlappingAABB(const ColliderRect& rect1, const ColliderRect& rect2)
+	bool CollisionSystem::IsRecttOverlappingAABB(const ColliderRect& rect1, const ColliderRect& rect2)
 	{
 		if (rect1.TopRight.X < rect2.TopLeft.X || rect1.TopLeft.X > rect2.TopRight.X) return false;
 		if (rect1.BottomLeft.Y < rect2.TopLeft.Y || rect1.TopLeft.Y > rect2.BottomLeft.Y) return false;
 		return true;
 	}
 
-	bool CollisionSystem::IsOverlapping(const ColliderRect& rect1, const ColliderRect& rect2)
+	bool CollisionSystem::IsRectOverlappingAxis(const ColliderRect& rect1, const ColliderRect& rect2)
 	{
 		Vector2 axes[4]
 		{
@@ -128,6 +141,105 @@ namespace Bloodforge
 		}
 
 		return true;
+	}
+
+	void CollisionSystem::CheckCircleCircle(std::unordered_set<uint64_t>& currentCollisions)
+	{
+		auto result = EntityManager::GetInstance().QueryEntities<CircleColliderComponent, TransformComponent>();
+
+		for (size_t index = 0; index < result.EntityViews.size(); ++index)
+		{
+			for (size_t innerIndex = index + 1; innerIndex < result.EntityViews.size(); ++innerIndex)
+			{
+				auto& circle1 = result.EntityViews[index].GetComponent<CircleColliderComponent>();
+				auto& circle2 = result.EntityViews[innerIndex].GetComponent<CircleColliderComponent>();
+
+				if (!CircleCircleOverlap(circle1, circle2)) continue;
+
+				HandleCollision<Bloodforge::CircleColliderComponent, Bloodforge::CircleColliderComponent>(circle1, circle2, result.EntityViews[index].EntityId, result.EntityViews[innerIndex].EntityId, currentCollisions);
+			}
+		}
+	}
+
+	bool CollisionSystem::CircleCircleOverlap(CircleColliderComponent & circle1, CircleColliderComponent & circle2)
+	{
+		TransformComponent* transform1 = EntityManager::GetInstance().GetComponent<TransformComponent>(circle1.OwnerEntityId);
+		TransformComponent* transform2 = EntityManager::GetInstance().GetComponent<TransformComponent>(circle2.OwnerEntityId);
+		Vector2 delta = transform1->GetWorldPosition() - transform2->GetWorldPosition();
+		float radiusSum = circle1.Radius + circle2.Radius;
+
+		return delta.SqrMagnitude() <= radiusSum * radiusSum;
+	}
+
+	void CollisionSystem::CheckCircleRect(std::unordered_set<uint64_t>& currentCollisions)
+	{
+		auto circleResult = EntityManager::GetInstance().QueryEntities<CircleColliderComponent, TransformComponent>();
+		auto rectResult = EntityManager::GetInstance().QueryEntities<RectColliderComponent, TransformComponent>();
+
+		for (size_t index = 0; index < circleResult.EntityViews.size(); ++index)
+		{
+			for (size_t innerIndex = 0; innerIndex < rectResult.EntityViews.size(); ++innerIndex)
+			{
+				auto& circle = circleResult.EntityViews[index].GetComponent<CircleColliderComponent>();
+				auto& rect = rectResult.EntityViews[innerIndex].GetComponent<RectColliderComponent>();
+
+				if (!CircleRectOverlap(circle, rect)) continue;
+
+				HandleCollision<Bloodforge::CircleColliderComponent, Bloodforge::RectColliderComponent>(circle, rect, circleResult.EntityViews[index].EntityId, rectResult.EntityViews[innerIndex].EntityId, currentCollisions);
+			}
+		}
+	}
+
+	bool CollisionSystem::CircleRectOverlap(CircleColliderComponent & circle, RectColliderComponent & rect)
+	{
+		Vector2 rectCenter = (rect.GetRect().TopLeft + rect.GetRect().BottomRight) * 0.5f;
+		TransformComponent* rectTransform = EntityManager::GetInstance().GetComponent<TransformComponent>(rect.OwnerEntityId);
+		TransformComponent* circleTransform = EntityManager::GetInstance().GetComponent<TransformComponent>(circle.OwnerEntityId);
+
+		Vector2 local = circleTransform->GetWorldPosition() - rectCenter;
+
+		local.Rotate(-rectTransform->GetWorldRotation());
+
+		float halfWidth = rect.GetRect().Width * 0.5f;
+		float halfHeight = rect.GetRect().Height * 0.5f;
+
+		Vector2 closest
+		{
+			std::clamp(local.X, -halfWidth, halfWidth),
+			std::clamp(local.Y, -halfHeight, halfHeight)
+		};
+
+		Vector2 delta = local - closest;
+
+		return delta.SqrMagnitude() <= circle.Radius * circle.Radius;
+	}
+
+	void CollisionSystem::CheckCollisionExits(std::unordered_set<uint64_t>& currentFrameCollisions)
+	{
+		EntityManager& entityManager = EntityManager::GetInstance();
+		for (const auto& lastFramePair : m_LastFrameCollisions)
+		{
+			if(!currentFrameCollisions.contains(lastFramePair))
+			{
+				int first = UnpackFirst(lastFramePair);
+				int second = UnpackSecond(lastFramePair);
+				Entity& firstEntity = entityManager.GetEntity(first);
+				Entity& secondEntity = entityManager.GetEntity(second);
+				if (!firstEntity.IsAlive || !secondEntity.IsAlive) continue;
+
+				RectColliderComponent* firstRect = entityManager.GetComponent<RectColliderComponent>(firstEntity);
+				CircleColliderComponent* firstCircle = entityManager.GetComponent<CircleColliderComponent>(firstEntity);
+				RectColliderComponent* secondRect = entityManager.GetComponent<RectColliderComponent>(secondEntity);
+				CircleColliderComponent* secondCircle = entityManager.GetComponent<CircleColliderComponent>(secondEntity);
+
+				if (!firstRect && !firstCircle) continue;
+				if (!secondRect && !secondCircle) continue;
+				bool firstIgnoresSecond = firstRect ? firstRect->IgnoreTags.contains(secondEntity.Tag) : firstCircle->IgnoreTags.contains(secondEntity.Tag);
+				bool secondIgnoresFirst = secondRect ? secondRect->IgnoreTags.contains(firstEntity.Tag) : secondCircle->IgnoreTags.contains(firstEntity.Tag);
+				if(!firstIgnoresSecond) firstRect ? firstRect->OnCollisionExitEvent.Invoke(first, second) : firstCircle->OnCollisionExitEvent.Invoke(first, second);
+				if(!secondIgnoresFirst) secondRect ? secondRect->OnCollisionExitEvent.Invoke(second, first) : secondCircle->OnCollisionExitEvent.Invoke(second, first);
+			}
+		}
 	}
 
 	uint64_t CollisionSystem::Pack(int a, int b)

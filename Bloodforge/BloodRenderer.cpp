@@ -90,6 +90,54 @@ namespace Bloodforge
 		SDL_RenderLines(GetSDLRenderer(), linePoints, 5);
 	}
 
+	void BloodRenderer::DrawCircle(const Vector2& center, float radius, const Color& color) const
+	{
+		Vector2 screenPos = center - GetCameraPosition();
+		SDL_SetRenderDrawColor(m_Renderer, color.r, color.g, color.b, color.a);
+
+		float offsetx = 0;
+		float offsety = radius;
+		float d = radius - 1.0f;
+		int status = 0;
+		float x = screenPos.X;
+		float y = screenPos.Y;
+
+		while (offsety >= offsetx)
+		{
+			status += SDL_RenderPoint(m_Renderer, x + offsetx, y + offsety);
+			status += SDL_RenderPoint(m_Renderer, x + offsety, y + offsetx);
+			status += SDL_RenderPoint(m_Renderer, x - offsetx, y + offsety);
+			status += SDL_RenderPoint(m_Renderer, x - offsety, y + offsetx);
+			status += SDL_RenderPoint(m_Renderer, x + offsetx, y - offsety);
+			status += SDL_RenderPoint(m_Renderer, x + offsety, y - offsetx);
+			status += SDL_RenderPoint(m_Renderer, x - offsetx, y - offsety);
+			status += SDL_RenderPoint(m_Renderer, x - offsety, y - offsetx);
+
+			if (status < 0)
+			{
+				status = -1;
+				break;
+			}
+
+			if (d >= 2 * offsetx)
+			{
+				d -= 2 * offsetx + 1;
+				offsetx += 1;
+			}
+			else if (d < 2 * (radius - offsety))
+			{
+				d += 2 * offsety - 1;
+				offsety -= 1;
+			}
+			else
+			{
+				d += 2 * (offsety - offsetx - 1);
+				offsety -= 1;
+				offsetx += 1;
+			}
+		}
+	}
+
 	void BloodRenderer::RenderTexture(const Texture2D& texture, const Vector2& pos, const Color& color) const
 	{
 		Vector2 screenPos = pos - GetCameraPosition();
