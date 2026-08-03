@@ -66,31 +66,69 @@ void LoadFunction()
 
 	Bloodforge::Entity& inconsistencyEntity = entityManager.CreateEntity();
 	int inconsistencyEntityId = inconsistencyEntity.Id;
-	entityManager.AddComponent<Bloodforge::SpriteComponent>(inconsistencyEntityId);
-	Bloodforge::SpriteAnimatorComponent* spriteAnimator = entityManager.AddComponent<Bloodforge::SpriteAnimatorComponent>(inconsistencyEntityId);
-	
-	Bloodforge::AnimationData animData;
-	animData.NumberOfFrames = 4;
-	animData.FrameTime = 0.08;
-	animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("InconsistencyArea.png");
+	{
+		Bloodforge::SpriteComponent* spriteComponent = entityManager.AddComponent<Bloodforge::SpriteComponent>(inconsistencyEntityId);
+		spriteComponent->Color = { 255, 0,0, 255 };
+		Bloodforge::SpriteAnimatorComponent* spriteAnimator = entityManager.AddComponent<Bloodforge::SpriteAnimatorComponent>(inconsistencyEntityId);
 
-	spriteAnimator->AddAnimation(CreateId("InconsistencyArea"), animData);
-	spriteAnimator->PlayAnimation(CreateId("InconsistencyArea"));
+		Bloodforge::AnimationData animData;
+		animData.NumberOfFrames = 4;
+		animData.FrameTime = 0.08;
+		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("InconsistencyArea.png");
 
-	Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(inconsistencyEntityId);
-	transform->SetLocalPosition(400.0f, 400.0f);
+		spriteAnimator->AddAnimation(CreateId("InconsistencyArea"), animData);
+		spriteAnimator->PlayAnimation(CreateId("InconsistencyArea"));
 
-	Bloodforge::CircleColliderComponent* circleCollider = entityManager.AddComponent<Bloodforge::CircleColliderComponent>(inconsistencyEntityId);
-	circleCollider->Radius = 80.0f;
+		Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(inconsistencyEntityId);
+		transform->SetLocalPosition(400.0f, 400.0f);
 
-	circleCollider->OnCollisionEnterEvent.AddListener([inconsistencyEntityId](int firstEntityId, int secondEntityId)
-		{
-			Bloodforge::Entity& otherEntity = Bloodforge::EntityManager::GetInstance().GetEntity(secondEntityId);
-			if (otherEntity.Tag == CreateId("BossProjectile"))
+		Bloodforge::CircleColliderComponent* circleCollider = entityManager.AddComponent<Bloodforge::CircleColliderComponent>(inconsistencyEntityId);
+		circleCollider->Radius = 80.0f;
+
+		circleCollider->OnCollisionEnterEvent.AddListener([inconsistencyEntityId](int firstEntityId, int secondEntityId)
 			{
-				Bloodforge::EntityManager::GetInstance().DestroyEntity(secondEntityId);
-			}
-		});
+				Bloodforge::Entity& otherEntity = Bloodforge::EntityManager::GetInstance().GetEntity(secondEntityId);
+				if (otherEntity.Tag == CreateId("BossProjectile"))
+				{
+					Bloodforge::EntityManager::GetInstance().DestroyEntity(secondEntityId);
+				}
+			});
+	}
+
+	Bloodforge::Entity& playerEntity = entityManager.CreateEntity();
+	int playerEntityId = playerEntity.Id;
+	{
+		entityManager.AddComponent<Bloodforge::SpriteComponent>(playerEntityId);
+		Bloodforge::SpriteAnimatorComponent* spriteAnimator = entityManager.AddComponent<Bloodforge::SpriteAnimatorComponent>(playerEntityId);
+		Bloodforge::AnimationData animData;
+		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("TempPlayer.png");
+		animData.NumberOfFrames = 10;
+		animData.FrameTime = 0.08;
+		spriteAnimator->AddAnimation(CreateId("PlayerAnim"), animData);
+		spriteAnimator->PlayAnimation(CreateId("PlayerAnim"));
+
+		Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(playerEntityId);
+		transform->SetLocalPosition(400.0f, 400.0f);
+	}
+
+	Bloodforge::Entity& bossEntity = entityManager.CreateEntity();
+	int bossEntityId = bossEntity.Id;
+	{
+		Bloodforge::SpriteComponent* spriteComp = entityManager.AddComponent<Bloodforge::SpriteComponent>(bossEntityId);
+		spriteComp->DrawOrder = 5;
+
+		Bloodforge::SpriteAnimatorComponent* spriteAnimator = entityManager.AddComponent<Bloodforge::SpriteAnimatorComponent>(bossEntityId);
+		Bloodforge::AnimationData animData;
+		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("TempFirstBoss.png");
+		animData.NumberOfFrames = 12;
+		animData.FrameTime = 0.08;
+		spriteAnimator->AddAnimation(CreateId("BossAnim"), animData);
+		spriteAnimator->PlayAnimation(CreateId("BossAnim"));
+
+		Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(bossEntityId);
+		transform->SetLocalPosition(Bloodforge::WindowUtils::GetWindowSize() / 2.0f);
+		transform->SetLocalScale({ 2.0f, 2.0f });
+	}
 }
 
 int main(int, char* [])

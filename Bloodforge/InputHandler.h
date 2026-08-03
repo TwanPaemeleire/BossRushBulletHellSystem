@@ -21,6 +21,7 @@ namespace Bloodforge
 		bool ongoing = false; // Mainly used for mouse motion
 		Vector2 InputActionVectorData; // Used for xy position of mouse
 		Vector2 InputActionVectorDeltaData; // Used for xy motion of mouse
+		ButtonId Button = 0; // The button that triggered the action
 	};
 
 	struct InputAction

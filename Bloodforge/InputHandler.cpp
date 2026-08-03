@@ -27,6 +27,7 @@ void Bloodforge::InputHandler::ProcessInput()
 			for (auto& [key, value] : m_InputActionMaps[m_CurrentMapId])
 			{
 				InputActionInfo info;
+				info.Button = value->Button;
 				if (keyEvent) 
 				{
 					if (value->Button != e.key.key) continue;

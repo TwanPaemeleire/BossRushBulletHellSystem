@@ -151,6 +151,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Player\PlayerMovementSystem.cpp" />
     <ClCompile Include="Projectiles\BasicProjectileSystem.cpp" />
     <ClCompile Include="BossActions\BossActionsFunctions.cpp" />
     <ClCompile Include="BossActions\BossAttackingSystem.cpp" />
@@ -162,6 +163,8 @@
   <ItemGroup>
     <ClInclude Include="Attacks\BossAction.h" />
     <ClInclude Include="Attacks\BossAttackingSystem.h" />
+    <ClInclude Include="Player\PlayerMovement.h" />
+    <ClInclude Include="Player\PlayerMovementSystem.h" />
     <ClInclude Include="Projectiles\BasicProjectileSystem.h" />
     <ClInclude Include="BossActions\BossAction.h" />
     <ClInclude Include="BossActions\BossAttackingSystem.h" />
