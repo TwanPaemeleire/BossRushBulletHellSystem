@@ -52,38 +52,32 @@ namespace Bloodforge
 	Vector2 Bloodforge::TransformComponent::GetWorldPosition()
 	{
 		const glm::mat4& world = GetWorldMatrix();
-		return { world[3][0], world[3][1] };
+		return 
+		{ 
+			world[3][0], 
+			world[3][1] 
+		};
 	}
 
 	float TransformComponent::GetWorldRotation()
 	{
-		glm::vec3 scale;
-		glm::quat orientation;
-		glm::vec3 translation;
-		glm::vec3 skew;
-		glm::vec4 perspective;
-
-		glm::decompose(GetWorldMatrix(), scale, orientation, translation, skew, perspective);
-		float radians = glm::eulerAngles(orientation).z;
-		return glm::degrees(radians);
+		const glm::mat4& world = GetWorldMatrix();
+		return glm::degrees(std::atan2(world[0][1], world[0][0]));
 	}
 
 	Vector2 TransformComponent::GetWorldScale()
 	{
-		glm::vec3 scale;
-		glm::quat orientation;
-		glm::vec3 translation;
-		glm::vec3 skew;
-		glm::vec4 perspective;
-
-		glm::decompose(GetWorldMatrix(), scale, orientation, translation, skew, perspective);
-		return { scale.x, scale.y };
+		const glm::mat4& world = GetWorldMatrix();
+		return 
+		{
+			glm::length(glm::vec3(world[0])),
+			glm::length(glm::vec3(world[1]))
+		};
 	}
 
 	Vector2 TransformComponent::GetForwardVector()
 	{
 		float radians = GetWorldRotation() * Vector2::DegreesToRadians;
-
 		return
 		{
 			std::cos(radians),

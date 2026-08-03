@@ -46,6 +46,7 @@ namespace Bloodforge
 
 	void BloodRenderer::Render()
 	{
+		CheckCameraValidity();
 		const Color& color = GetBackgroundColor();
 		SDL_SetRenderDrawColor(m_Renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderClear(m_Renderer);
@@ -269,10 +270,25 @@ namespace Bloodforge
 		return SDL_FPoint{ point.x - cameraPos.X, point.y - cameraPos.Y };
 	}
 
+	void BloodRenderer::CheckCameraValidity()
+	{
+		if (m_CameraEntityId == -1)
+		{
+			EntityView<CameraComponent, TransformComponent> view = EntityManager::GetInstance().GetOrCreateFirstEntityWithComponents<CameraComponent, TransformComponent>();
+			m_CameraEntityId = view.EntityId;
+		}
+		if (m_CameraEntityId != -1)
+		{
+			EntityManager& entityManager = EntityManager::GetInstance();
+			if (entityManager.GetEntity(m_CameraEntityId).MarkedForDestruction || !entityManager.HasComponent<CameraComponent>(m_CameraEntityId))
+			{
+				m_CameraEntityId = -1;
+			}
+		}
+	}
+
 	Vector2 BloodRenderer::GetCameraPosition() const
 	{
-		EntityView<CameraComponent, TransformComponent> view = EntityManager::GetInstance().GetOrCreateFirstEntityWithComponents<CameraComponent, TransformComponent>();
-		TransformComponent& transformComp = view.GetComponent<TransformComponent>();
-		return transformComp.GetWorldPosition();
+		return EntityManager::GetInstance().GetComponent<TransformComponent>(m_CameraEntityId)->GetWorldPosition();
 	}
 }

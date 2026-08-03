@@ -3,8 +3,6 @@
 #include <Boss/RuntimeCurrentBossData.h>
 #include <IdCreator.h>
 #include <CustomCoroutine.h>
-#include <cstdlib>
-#include <ctime>
 #include <Vector2.h>
 #include <BloodTime.h>
 #include <MathUtils.h>
@@ -54,6 +52,7 @@ Coroutine ShootBullet(int shooterIdx)
 
 		RectColliderComponent* collider = entityManager.AddComponent<RectColliderComponent>(bulletEntityId);
 		collider->SetSize({ 42.0f, 20.0f });
+		collider->IgnoreTags.insert(CreateId("BossProjectile"));
 
         co_await WaitForSeconds(currentBlackboard.Get<float>(CreateId("BulletShootDelay")));
     }

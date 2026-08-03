@@ -40,6 +40,7 @@ namespace Bloodforge
 		Vector2 ScreenToWorldPoint(Vector2 screen) const;
 	private:
 		SDL_FPoint TransformPoint(const glm::mat4& worldMatrix, float x, float y) const;
+		void CheckCameraValidity();
 		Vector2 GetCameraPosition() const;
 
 		SDL_Renderer* m_Renderer{};
@@ -48,5 +49,6 @@ namespace Bloodforge
 
 		int m_WindowWidth{};
 		int m_WindowHeight{};
+		int m_CameraEntityId{ -1 };
 	};
 }

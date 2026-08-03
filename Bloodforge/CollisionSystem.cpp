@@ -92,7 +92,7 @@ namespace Bloodforge
 			const ColliderRect& collisionRect = rect.GetRect();
 			BloodRenderer::GetInstance().DrawRectangle(collisionRect, Color(255, 255, 255, 255));
 		}
-
+		
 		auto circleResult = EntityManager::GetInstance().QueryEntities<CircleColliderComponent, TransformComponent>();
 		for (EntityView<CircleColliderComponent, TransformComponent>& view : circleResult.EntityViews)
 		{

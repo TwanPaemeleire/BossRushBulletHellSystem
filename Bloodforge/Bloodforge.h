@@ -20,7 +20,7 @@ namespace Bloodforge
 
 	private:
 		const float m_FixedTimeStep{ 1.f / 60.f };
-		const int m_MsPerFrame{ 1000 / 144 };
+		const int m_MsPerFrame{ 1000 / 500 };
 		bool m_ShouldContinue = true;
 
 		friend class Singleton<Bloodforge>;

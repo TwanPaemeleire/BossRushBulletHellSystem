@@ -25,6 +25,9 @@
 #include <SpriteAnimatorComponent.h>
 #include <ResourceManager.h>
 #include <CircleColliderComponent.h>
+#include "Player/PlayerMovementSystem.h"
+#include "Player/PlayerMovement.h"
+#include "Utils/FpsDisplaySystem.h"
 
 void SaveAllBosses()
 {
@@ -48,12 +51,27 @@ void SaveAllBosses()
 	factory.WriteAllToFiles();
 }
 
+void MakeBackgroundPart(int layer)
+{
+	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
+	Bloodforge::Entity& backgroundEntity = entityManager.CreateEntity();
+	int backgroundEntityId = backgroundEntity.Id;
+	{
+		Bloodforge::SpriteComponent* spriteComp = entityManager.AddComponent<Bloodforge::SpriteComponent>(backgroundEntityId);
+		spriteComp->DrawOrder = -layer;
+		spriteComp->SetTexture(Bloodforge::ResourceManager::GetInstance().LoadTexture("Background/" + std::to_string(layer) + ".png"));
+
+		Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(backgroundEntityId);
+		transform->SetLocalPosition(Bloodforge::WindowUtils::GetWindowSize() / 2.0f);
+		transform->SetLocalScale({ 1.0f, 1.0f });
+	}
+}
+
 void LoadFunction()
 {
 	Bloodforge::EntityManager& entityManager = Bloodforge::EntityManager::GetInstance();
-	Bloodforge::SceneSystemManager& sceneSystemManager = Bloodforge::SceneSystemManager::GetInstance();
 
-	BossesDataBank& dataBank = entityManager.GetOrCreateFirstEntityWithComponents<BossesDataBank>().GetComponent<BossesDataBank>();
+	entityManager.GetOrCreateFirstEntityWithComponents<BossesDataBank>().GetComponent<BossesDataBank>();
 
 	RuntimeCurrentBossData& runtimeBossData = entityManager.GetOrCreateFirstEntityWithComponents<RuntimeCurrentBossData>().GetComponent<RuntimeCurrentBossData>();
 	
@@ -73,7 +91,7 @@ void LoadFunction()
 
 		Bloodforge::AnimationData animData;
 		animData.NumberOfFrames = 4;
-		animData.FrameTime = 0.08;
+		animData.FrameTime = 0.08f;
 		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("InconsistencyArea.png");
 
 		spriteAnimator->AddAnimation(CreateId("InconsistencyArea"), animData);
@@ -85,7 +103,7 @@ void LoadFunction()
 		Bloodforge::CircleColliderComponent* circleCollider = entityManager.AddComponent<Bloodforge::CircleColliderComponent>(inconsistencyEntityId);
 		circleCollider->Radius = 80.0f;
 
-		circleCollider->OnCollisionEnterEvent.AddListener([inconsistencyEntityId](int firstEntityId, int secondEntityId)
+		circleCollider->OnCollisionEnterEvent.AddListener([inconsistencyEntityId](int, int secondEntityId)
 			{
 				Bloodforge::Entity& otherEntity = Bloodforge::EntityManager::GetInstance().GetEntity(secondEntityId);
 				if (otherEntity.Tag == CreateId("BossProjectile"))
@@ -103,12 +121,14 @@ void LoadFunction()
 		Bloodforge::AnimationData animData;
 		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("TempPlayer.png");
 		animData.NumberOfFrames = 10;
-		animData.FrameTime = 0.08;
+		animData.FrameTime = 0.08f;
 		spriteAnimator->AddAnimation(CreateId("PlayerAnim"), animData);
 		spriteAnimator->PlayAnimation(CreateId("PlayerAnim"));
 
 		Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(playerEntityId);
 		transform->SetLocalPosition(400.0f, 400.0f);
+
+		entityManager.AddComponent<PlayerMovement>(playerEntityId);
 	}
 
 	Bloodforge::Entity& bossEntity = entityManager.CreateEntity();
@@ -121,7 +141,7 @@ void LoadFunction()
 		Bloodforge::AnimationData animData;
 		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("TempFirstBoss.png");
 		animData.NumberOfFrames = 12;
-		animData.FrameTime = 0.08;
+		animData.FrameTime = 0.08f;
 		spriteAnimator->AddAnimation(CreateId("BossAnim"), animData);
 		spriteAnimator->PlayAnimation(CreateId("BossAnim"));
 
@@ -129,6 +149,12 @@ void LoadFunction()
 		transform->SetLocalPosition(Bloodforge::WindowUtils::GetWindowSize() / 2.0f);
 		transform->SetLocalScale({ 2.0f, 2.0f });
 	}
+
+	// MakeBackgroundPart(1);
+	// MakeBackgroundPart(2);
+	// MakeBackgroundPart(3);
+	// MakeBackgroundPart(4);
+	// MakeBackgroundPart(5);
 }
 
 int main(int, char* [])
@@ -149,6 +175,8 @@ int main(int, char* [])
 
 	sceneSystemManager.TryRegisterSystem<BossAttackingSystem>();
 	sceneSystemManager.TryRegisterSystem<BasicProjectileSystem>();
+	sceneSystemManager.TryRegisterSystem<PlayerMovementSystem>();
+	sceneSystemManager.TryRegisterSystem<FpsDisplaySystem>();
 
 	Bloodforge::InputHandler::GetInstance().CreateMap(CreateId("MainMap"));
 	Bloodforge::InputHandler::GetInstance().SetCurrentMap(CreateId("MainMap"));
