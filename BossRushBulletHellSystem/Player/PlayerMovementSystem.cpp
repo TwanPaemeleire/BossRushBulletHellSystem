@@ -32,22 +32,28 @@ void PlayerMovementSystem::OnUpdate()
 {
 	auto result = EntityManager::GetInstance().GetFirstEntityWithComponents<PlayerMovement, TransformComponent, SpriteComponent>().value();
 	PlayerMovement& playerMovement = result.GetComponent<PlayerMovement>();
-	if (playerMovement.CurrentMovementSpeed == 0.0f) return;
 	TransformComponent& transform = result.GetComponent<TransformComponent>();
-	Vector2 newPos = transform.GetLocalPosition() + playerMovement.MovementDirection * playerMovement.CurrentMovementSpeed * BloodTime::GetInstance().DeltaTime;
-	
-	SpriteComponent& sprite = result.GetComponent<SpriteComponent>();
-	Vector2 frameSize = { sprite.GetSourceRect().Width, sprite.GetSourceRect().Height };
-
 	Vector2 windowSize = WindowUtils::GetWindowSize();
 
-	// Check if within window bounds, position is center of sprite
-	if (newPos.X - frameSize.X / 2 < 0) newPos.X = frameSize.X / 2; // Left bound
-	if (newPos.X + frameSize.X / 2 > windowSize.X) newPos.X = windowSize.X - frameSize.X / 2; // Right bound
-	if (newPos.Y - frameSize.Y / 2 < 0) newPos.Y = frameSize.Y / 2; // Top bound
-	if (newPos.Y + frameSize.Y / 2 > windowSize.Y) newPos.Y = windowSize.Y - frameSize.Y / 2; // Bottom bound
+	if (playerMovement.CurrentMovementSpeed != 0.0f)
+	{
+		Vector2 newPos = transform.GetLocalPosition() + playerMovement.MovementDirection * playerMovement.CurrentMovementSpeed * BloodTime::GetInstance().DeltaTime;
 
-	transform.SetLocalPosition(newPos);
+		SpriteComponent& sprite = result.GetComponent<SpriteComponent>();
+		Vector2 frameSize = { sprite.GetSourceRect().Width, sprite.GetSourceRect().Height };
+
+		// Check if within window bounds, position is center of sprite
+		if (newPos.X - frameSize.X / 2 < 0) newPos.X = frameSize.X / 2; // Left bound
+		if (newPos.X + frameSize.X / 2 > windowSize.X) newPos.X = windowSize.X - frameSize.X / 2; // Right bound
+		if (newPos.Y - frameSize.Y / 2 < 0) newPos.Y = frameSize.Y / 2; // Top bound
+		if (newPos.Y + frameSize.Y / 2 > windowSize.Y) newPos.Y = windowSize.Y - frameSize.Y / 2; // Bottom bound
+
+		transform.SetLocalPosition(newPos);
+	}
+
+	// Rotate player to screen/boss center
+	Vector2 dirToCenter = Vector2(windowSize.X / 2, windowSize.Y / 2) - transform.GetWorldPosition();
+	transform.SetLocalRotation(Vector2::SignedAngle(Vector2(0.0f, -1.0f), dirToCenter));
 }
 
 void PlayerMovementSystem::ProcessPlayerMovementInput(const InputActionInfo& info)

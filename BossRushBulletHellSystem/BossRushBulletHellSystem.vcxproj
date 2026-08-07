@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="Attacks\BossAction.h" />
     <ClInclude Include="Attacks\BossAttackingSystem.h" />
+    <ClInclude Include="Boss\BossHealth.h" />
     <ClInclude Include="Utils\FPSDisplayer.h" />
     <ClInclude Include="Utils\FpsDisplaySystem.h" />
     <ClInclude Include="Player\PlayerMovement.h" />

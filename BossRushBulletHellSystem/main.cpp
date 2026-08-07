@@ -81,7 +81,6 @@ void LoadFunction()
 	runtimeBossData.CurrentBossLevel = 0;
 	runtimeBossData.StartBossFightTrigger = true;
 
-
 	Bloodforge::Entity& inconsistencyEntity = entityManager.CreateEntity();
 	int inconsistencyEntityId = inconsistencyEntity.Id;
 	{
@@ -131,30 +130,11 @@ void LoadFunction()
 		entityManager.AddComponent<PlayerMovement>(playerEntityId);
 	}
 
-	Bloodforge::Entity& bossEntity = entityManager.CreateEntity();
-	int bossEntityId = bossEntity.Id;
-	{
-		Bloodforge::SpriteComponent* spriteComp = entityManager.AddComponent<Bloodforge::SpriteComponent>(bossEntityId);
-		spriteComp->DrawOrder = 5;
-
-		Bloodforge::SpriteAnimatorComponent* spriteAnimator = entityManager.AddComponent<Bloodforge::SpriteAnimatorComponent>(bossEntityId);
-		Bloodforge::AnimationData animData;
-		animData.Texture = Bloodforge::ResourceManager::GetInstance().LoadTexture("TempFirstBoss.png");
-		animData.NumberOfFrames = 12;
-		animData.FrameTime = 0.08f;
-		spriteAnimator->AddAnimation(CreateId("BossAnim"), animData);
-		spriteAnimator->PlayAnimation(CreateId("BossAnim"));
-
-		Bloodforge::TransformComponent* transform = entityManager.GetComponent<Bloodforge::TransformComponent>(bossEntityId);
-		transform->SetLocalPosition(Bloodforge::WindowUtils::GetWindowSize() / 2.0f);
-		transform->SetLocalScale({ 2.0f, 2.0f });
-	}
-
-	// MakeBackgroundPart(1);
-	// MakeBackgroundPart(2);
-	// MakeBackgroundPart(3);
-	// MakeBackgroundPart(4);
-	// MakeBackgroundPart(5);
+	//MakeBackgroundPart(1);
+	//MakeBackgroundPart(2);
+	//MakeBackgroundPart(3);
+	//MakeBackgroundPart(4);
+	//MakeBackgroundPart(5);
 }
 
 int main(int, char* [])
